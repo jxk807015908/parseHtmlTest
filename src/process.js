@@ -1,6 +1,7 @@
 import {
   getAttrs,
-  getBindingAttr
+  getBindingAttr,
+  getAttrByReg
 } from "./utils";
 
 // 处理v-pre属性
@@ -98,5 +99,32 @@ export function processRef(el) {
       }
       return false;
     })();
+  }
+}
+
+// 处理v-slot、slot、scope和slot-scope属性
+export function processSlotContent(el) {
+  let val = getBindingAttr(el, 'scope') || getBindingAttr(el, 'slot-scope');
+  if (val) {
+    el.slotScope = val;
+  }
+  let slotTarget = getBindingAttr(el, 'slot');
+  if (slotTarget) {
+    el.slotTarget = slotTarget === '""' ? '"default"' : slotTarget;
+    el.slotTargetDynamic = !!el.attrsMap[':slot'] || !!el.attrsMap['v-bind:slot'];
+  }
+
+  let slotAttrs = getAttrByReg(el, /^v-slot|#/);
+  if (slotAttrs) {
+    // todo v-slot没有加在template上的情况暂时不做处理
+    let slotMatch = slotAttrs.name.match(/^(?:v-slot|#)(?::(?:(\[)([^\[\]]+)\]|([^\[\]]+)))?/);
+    let slotTarget = slotMatch[2] || slotMatch[3];
+    el.slotTargetDynamic = !!slotMatch[1];
+    if (el.slotTargetDynamic) {
+      el.slotTarget = slotTarget
+    } else {
+      el.slotTarget = JSON.stringify(slotTarget) || '"default"';
+    }
+    el.slotScope = slotAttrs.value;
   }
 }

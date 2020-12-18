@@ -20,6 +20,10 @@
     </p>
     <dj-scroll-box ref="box">
         <div slot="empty" slot-scope="scope">aaaaaa</div>
+        <div :slot="slotName" slot-scope="scope">aaaaaa</div>
+        <template v-slot="ssss"></template>
+        <template v-slot:[slotName]="ssss"></template>
+        <template v-slot:header="ssss"></template>
     </dj-scroll-box>
     <component :is="table" v-once></component>
 </div>

@@ -18,3 +18,8 @@ export function getBindingAttr(el, name) {
     return value && JSON.stringify(value);
   }
 }
+
+// 获取对应属性值的表达式
+export function getAttrByReg(el, reg) {
+  return el.attrsList.find(obj=>reg.test(obj.name));
+}
