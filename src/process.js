@@ -135,3 +135,14 @@ export function processSlotOutlet(el) {
     el.slotName = getBindingAttr(el, 'name');
   }
 }
+
+// 处理is、inline-template属性
+export function processComponent(el) {
+  let val = getBindingAttr(el, 'is');
+  if (val) {
+    el.component = val;
+  }
+  if (getBindingAttr(el, 'inline-template') !== undefined ) {
+    el.inlineTemplate = true;
+  }
+}

@@ -3,6 +3,7 @@
         <li v-for="item in list" :class="{'is-active': item.val === active}" v-bind:config="config">
             label: {{item.label}}
         </li>
+        <a inline-template></a>
     </ui>
     <ui v-else-if="type === 2">
         <li v-for="(item, index, index2) in list" :ref="index" class="class-name" v-once v-bind:item="item" @click.prevent="handleClick">
