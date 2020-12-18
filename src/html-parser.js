@@ -3,7 +3,9 @@ import {
 } from "./utils";
 import {
   processVPre,
-  processFor
+  processFor,
+  processIf,
+  processIfConditions
 } from "./process";
 
 // 标签开头正则
@@ -118,6 +120,7 @@ function htmlParser(html = '') {
 
     if (!inVPre) {
       processFor(el);
+      processIf(el);
     }
 
 
@@ -151,7 +154,9 @@ function htmlParser(html = '') {
       }
     }
 
-    if (currentParent) {
+    processIfConditions(el);
+
+    if (currentParent && !(el.elseif || el.else)) {
       currentParent.children.push(el);
     }
   }

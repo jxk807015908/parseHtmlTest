@@ -30,3 +30,38 @@ export function processFor(el) {
     }
   }
 }
+
+// 处理v-if属性
+export function processIf(el) {
+  let val = getAttrs(el, 'v-if');
+  if (val) {
+    el.if = val;
+    el.ifConditions = [{
+      exp: val,
+      block: el
+    }];
+  } else {
+    val = getAttrs(el, 'v-else-if');
+    if (val) {
+      el.elseif = val;
+    } else {
+      val = getAttrs(el, 'v-else');
+      if (val || val === '') {
+        el.else = true;
+      }
+    }
+  }
+}
+
+// 有v-else-if和v-else属性的节点的后续处理
+export function processIfConditions(el) {
+  if (el.elseif || el.else) {
+    let prevElement = el.parent.children[el.parent.children.length - 1];
+    if (prevElement.if) {
+      prevElement.ifConditions.push({
+        exp: el.elseif || el.else,
+        block: el
+      })
+    }
+  }
+}
