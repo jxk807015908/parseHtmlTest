@@ -10,10 +10,21 @@ const START_TAG_END_REG = /^\s*(\/?)>/;
 // 闭合标签正则
 const END_TAG_REG = /^<\/([a-zA-Z_\-]*)[^>]*>/;
 
+function createASTElement(tag, attrs, parent) {
+  return {
+    tag,
+    attrsList: attrs,
+    parent,
+    children: []
+  }
+}
+
 //编译HTML
 function htmlParser(html = '') {
 
   let stack = [];
+  let inVPre = false;
+  let currentParent,root;
 
   function cutHtml(num) {
     html = html.slice(num);
@@ -68,7 +79,7 @@ function htmlParser(html = '') {
     }
     chars(rest);
   }
-  console.log(stack);
+  // console.log(stack);
 
   // 对开头标签的进一步处理
   function handleStartTag(tag, attrs, unary) {
@@ -78,28 +89,36 @@ function htmlParser(html = '') {
       name: match[1]
     }));
     start(tag, attrsList);
-    unary && end();
+    unary && end(tag);
   }
 
   // 处理开头标签（涉及到节点栈的处理）， 如<p>
   function start(tag, attrs) {
-    stack.push({
-      tag,
-      attrs
-    });
+    let el = createASTElement(tag, attrs, currentParent);
+    !currentParent && (root = el);
+    currentParent = el;
+    stack.push(el);
   }
 
   // 处理结尾标签（涉及到节点栈的处理）， 如</p>
-  function end() {
-
+  function end(tag) {
+    let el = stack.pop();
+    currentParent = stack[stack.length - 1]
+    if (currentParent) {
+      currentParent.children.push(el);
+    }
   }
 
   // 处理文本节点（涉及到节点栈的处理）
   function chars(text) {
-    stack.push({
-      text
-    });
+    if (currentParent) {
+      currentParent.children.push({
+        text
+      });
+    }
   }
+
+  return root;
 }
 
 
