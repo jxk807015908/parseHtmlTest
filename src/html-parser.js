@@ -2,15 +2,16 @@ import {
   getAttrsMap,
 } from "./utils";
 import {
-  processVPre
+  processVPre,
+  processFor
 } from "./process";
 
 // 标签开头正则
 const START_TAG_REG = /^<([a-zA-Z_][\-a-zA-Z0-9_.]*)/;
 // 标签静态属性正则
-const ATTRS_REG = /^\s*([^\s<>\/"'=]+)(?:\s*=\s*(("[^"]+")|('[^']+')))?/;
+const ATTRS_REG = /^\s*([^\s<>\/"'=]+)(?:\s*=\s*(?:"([^"]+)"|'([^'])+'))?/;
 // 标签动态属性正则
-const DYNAMIC_ATTRS_REG = /^\s*((?:v-[\w-]+|:|@|\.|#)(\[[^\s<>\/"'=]+\]))(?:\s*=\s*(("[^"]+")|('[^']+')))?/;
+const DYNAMIC_ATTRS_REG = /^\s*((?:v-[\w-]+|:|@|\.|#)(\[[^\s<>\/"'=]+\]))(?:\s*=\s*(?:"([^"]+)"|'([^']+)'))?/;
 // 开头标签结尾正则
 const START_TAG_END_REG = /^\s*(\/?)>/;
 
@@ -114,6 +115,11 @@ function htmlParser(html = '') {
         inVPre = true;
       }
     }
+
+    if (!inVPre) {
+      processFor(el);
+    }
+
 
     if (tag === 'pre') {
       inPre = true;
