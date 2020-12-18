@@ -36,6 +36,7 @@ function htmlParser(html = '') {
 
   let stack = [];
   let inVPre = false;
+  let inPre = false;
   let currentParent,root;
 
   function cutHtml(num) {
@@ -114,6 +115,9 @@ function htmlParser(html = '') {
       }
     }
 
+    if (tag === 'pre') {
+      inPre = true;
+    }
 
     !currentParent && (root = el);
     currentParent = el;
@@ -124,6 +128,23 @@ function htmlParser(html = '') {
   function end(tag) {
     let el = stack.pop();
     currentParent = stack[stack.length - 1]
+
+    if (el.pre) {
+      inVPre = false;
+    }
+    
+    if (el.tag === 'pre') {
+      inPre = false;
+      // 外层仍有pre标签时，inPre依然应该是true
+      let target = el;
+      while (target) {
+        if (el.tag === 'pre') {
+          inPre = true;
+          break
+        }
+      }
+    }
+
     if (currentParent) {
       currentParent.children.push(el);
     }
@@ -132,9 +153,11 @@ function htmlParser(html = '') {
   // 处理文本节点（涉及到节点栈的处理）
   function chars(text) {
     if (currentParent) {
-      currentParent.children.push({
-        text
-      });
+      if (inPre || inVPre || text.trim()) {
+        currentParent.children.push({
+          text: text
+        });
+      }
     }
   }
 
