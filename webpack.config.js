@@ -1,5 +1,32 @@
 const path = require('path');
+const os = require('os');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+//获取本地ip地址
+function getNetworkIp() {
+  let needHost = ""; // 打开的host
+  try {
+    // 获得网络接口列表
+    let network = os.networkInterfaces();
+    for (let dev in network) {
+      let iface = network[dev];
+      for (let i = 0; i < iface.length; i++) {
+        let alias = iface[i];
+        if (
+          alias.family === "IPv4" &&
+          alias.address !== "127.0.0.1" &&
+          !alias.internal
+        ) {
+          needHost = alias.address;
+        }
+      }
+    }
+  } catch (e) {
+    needHost = "localhost";
+  }
+  return needHost;
+}
+
 module.exports = {
   entry: path.resolve(__dirname, './index.js'),
   output: {//多出口, 这里的[name] 对应 page1 和 page2 取代
@@ -49,7 +76,7 @@ module.exports = {
   ],
   devServer: {
     contentBase: "./public",//服务器访问的基本路径
-    host: 'localhost',//服务器ip
-    port: 8080,//端口
+    host: getNetworkIp(),//服务器ip
+    // port: 3333,//端口
   }
 }
