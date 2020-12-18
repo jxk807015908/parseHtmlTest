@@ -1,5 +1,6 @@
 import {
-  getAttrs
+  getAttrs,
+  getBindingAttr
 } from "./utils";
 
 // 处理v-pre属性
@@ -71,5 +72,13 @@ export function processOnce(el) {
   let val = getAttrs(el, 'v-once');
   if (val || val === '') {
     el.once = true;
+  }
+}
+
+// 处理key
+export function processKey(el) {
+  let val = getBindingAttr(el, 'key');
+  if (val) {
+    el.key = val;
   }
 }

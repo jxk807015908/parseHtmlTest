@@ -6,7 +6,8 @@ import {
   processFor,
   processIf,
   processIfConditions,
-  processOnce
+  processOnce,
+  processKey,
 } from "./process";
 
 // 标签开头正则
@@ -140,6 +141,11 @@ function htmlParser(html = '') {
     let el = stack.pop();
     currentParent = stack[stack.length - 1]
 
+    if (inVPre) {
+      processKey(el);
+      processIfConditions(el);
+    }
+
     if (el.pre) {
       inVPre = false;
     }
@@ -155,8 +161,6 @@ function htmlParser(html = '') {
         }
       }
     }
-
-    processIfConditions(el);
 
     if (currentParent && !(el.elseif || el.else)) {
       currentParent.children.push(el);

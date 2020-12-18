@@ -7,3 +7,14 @@ export function getAttrsMap(attrs = []) {
 export function getAttrs(el, name) {
   return el.attrsMap[name];
 }
+
+// 获取对应属性值的表达式
+export function getBindingAttr(el, name) {
+  let dynamicValue = getAttrs(el, `v-bind:${name}`) || getAttrs(el, `:${name}`);
+  if (dynamicValue)
+    return dynamicValue;
+  else {
+    let value = getAttrs(el, name);
+    return value && JSON.stringify(value);
+  }
+}
