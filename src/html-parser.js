@@ -1,3 +1,10 @@
+import {
+  getAttrsMap,
+} from "./utils";
+import {
+  processVPre
+} from "./process";
+
 // 标签开头正则
 const START_TAG_REG = /^<([a-zA-Z_][\-a-zA-Z0-9_.]*)/;
 // 标签静态属性正则
@@ -14,9 +21,14 @@ function createASTElement(tag, attrs, parent) {
   return {
     tag,
     attrsList: attrs,
+    attrsMap: getAttrsMap(attrs),
     parent,
     children: []
   }
+}
+
+function trimEndingWhitespace() { 
+
 }
 
 //编译HTML
@@ -85,7 +97,7 @@ function htmlParser(html = '') {
   function handleStartTag(tag, attrs, unary) {
     // 处理属性
     let attrsList = attrs.map(match => ({
-      value: match[2] || match[3],
+      value: match[2] || match[3] || '',
       name: match[1]
     }));
     start(tag, attrsList);
@@ -95,6 +107,14 @@ function htmlParser(html = '') {
   // 处理开头标签（涉及到节点栈的处理）， 如<p>
   function start(tag, attrs) {
     let el = createASTElement(tag, attrs, currentParent);
+
+    if (!inVPre) {
+      if (processVPre(el)) {
+        inVPre = true;
+      }
+    }
+
+
     !currentParent && (root = el);
     currentParent = el;
     stack.push(el);
