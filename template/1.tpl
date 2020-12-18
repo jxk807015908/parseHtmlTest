@@ -12,6 +12,7 @@
     <ui v-else>
         <li .innerHtml="innerHtml" v-scroll-drag:[state]="aaaa">
             <slot name="content" :item="item"></slot>
+            <slot :name="content" :item="item"></slot>
         </li>
         <input value="val" />
     </ui>

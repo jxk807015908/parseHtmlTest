@@ -128,3 +128,10 @@ export function processSlotContent(el) {
     el.slotScope = slotAttrs.value;
   }
 }
+
+// 处理标签名为slot的节点
+export function processSlotOutlet(el) {
+  if (el.tag === 'slot') {
+    el.slotName = getBindingAttr(el, 'name');
+  }
+}
