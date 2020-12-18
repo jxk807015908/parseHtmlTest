@@ -21,5 +21,5 @@
     <dj-scroll-box ref="box">
         <div slot="empty" slot-scope="scope">aaaaaa</div>
     </dj-scroll-box>
-    <component :is="table"></component>
+    <component :is="table" v-once></component>
 </div>

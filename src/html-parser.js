@@ -5,7 +5,8 @@ import {
   processVPre,
   processFor,
   processIf,
-  processIfConditions
+  processIfConditions,
+  processOnce
 } from "./process";
 
 // 标签开头正则
@@ -121,6 +122,7 @@ function htmlParser(html = '') {
     if (!inVPre) {
       processFor(el);
       processIf(el);
+      processOnce(el);
     }
 
 

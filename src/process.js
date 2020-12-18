@@ -65,3 +65,11 @@ export function processIfConditions(el) {
     }
   }
 }
+
+// 处理v-once
+export function processOnce(el) {
+  let val = getAttrs(el, 'v-once');
+  if (val || val === '') {
+    el.once = true;
+  }
+}
