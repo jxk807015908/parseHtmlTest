@@ -8,6 +8,7 @@ import {
   processIfConditions,
   processOnce,
   processKey,
+  processRef,
 } from "./process";
 
 // 标签开头正则
@@ -141,8 +142,9 @@ function htmlParser(html = '') {
     let el = stack.pop();
     currentParent = stack[stack.length - 1]
 
-    if (inVPre) {
+    if (!inVPre) {
       processKey(el);
+      processRef(el);
       processIfConditions(el);
     }
 

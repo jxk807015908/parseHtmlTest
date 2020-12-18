@@ -5,7 +5,7 @@
         </li>
     </ui>
     <ui v-else-if="type === 2">
-        <li v-for="(item, index, index2) in list" class="class-name" v-once v-bind:item="item" @click.prevent="handleClick">
+        <li v-for="(item, index, index2) in list" :ref="index" class="class-name" v-once v-bind:item="item" @click.prevent="handleClick">
             index
         </li>
     </ui>

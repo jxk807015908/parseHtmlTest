@@ -82,3 +82,21 @@ export function processKey(el) {
     el.key = val;
   }
 }
+
+// 处理ref
+export function processRef(el) {
+  let val = getBindingAttr(el, 'ref');
+  if (val) {
+    el.ref = val;
+    el.refInFor = (()=>{
+      let parent = el;
+      while (parent) {
+        if (parent.for) {
+          return true;
+        }
+        parent = parent.parent;
+      }
+      return false;
+    })();
+  }
+}
