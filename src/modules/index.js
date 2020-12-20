@@ -1,2 +1,3 @@
 import _class from "./class";
-export default [_class]
+import style from "./style";
+export default [_class, style]
