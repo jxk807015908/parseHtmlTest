@@ -123,3 +123,7 @@ export function parseText(text) {
   }
 }
 
+export function pluckModuleFunction(modules = [], key) {
+  return modules.map(module=>module[key]).filter(o=>o);
+}
+

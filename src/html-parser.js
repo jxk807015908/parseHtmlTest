@@ -1,6 +1,7 @@
 import {
   getAttrsMap,
   parseText,
+  pluckModuleFunction,
 } from "./utils";
 import {
   processVPre,
@@ -43,12 +44,16 @@ function trimEndingWhitespace() {
 }
 
 //编译HTML
-function htmlParser(html = '') {
+function htmlParser(html = '', options = {}) {
 
   let stack = [];
   let inVPre = false;
   let inPre = false;
   let currentParent,root;
+
+  let transforms = pluckModuleFunction(options.modules, 'transformNode')
+  let preTransforms = pluckModuleFunction(options.modules, 'preTransformNode')
+  let postTransforms = pluckModuleFunction(options.modules, 'postTransformNode')
 
   function cutHtml(num) {
     html = html.slice(num);
@@ -58,7 +63,7 @@ function htmlParser(html = '') {
     // debugger
     // 匹配标签头
     let startMatch = html.match(START_TAG_REG);
-    console.log('startMatch', startMatch);
+    // console.log('startMatch', startMatch);
     if (startMatch) {
       cutHtml(startMatch[0].length);
       let tag = startMatch[1];
@@ -71,13 +76,13 @@ function htmlParser(html = '') {
       }
       handleStartTag(tag, attrs, !!end[1]);
       cutHtml(end[0].length);
-      console.log('attrs', attrs);
+      // console.log('attrs', attrs);
       continue;
     }
 
     // 匹配尾标签
     let endMatch = html.match(END_TAG_REG);
-    console.log('endMatch', endMatch);
+    // console.log('endMatch', endMatch);
     if (endMatch) {
       cutHtml(endMatch[0].length);
       let tag = endMatch[1];
@@ -120,6 +125,10 @@ function htmlParser(html = '') {
   function start(tag, attrs) {
     let el = createASTElement(tag, attrs, currentParent);
 
+    preTransforms.forEach(preTransform=>{
+      el = preTransform(el, options) || el;
+    });
+
     if (!inVPre) {
       if (processVPre(el)) {
         inVPre = true;
@@ -153,6 +162,9 @@ function htmlParser(html = '') {
       processSlotContent(el);
       processSlotOutlet(el);
       processComponent(el);
+      transforms.forEach(transform=>{
+        el = transform(el, options) || el;
+      });
       processAttrs(el);
       processIfConditions(el);
     }
@@ -176,6 +188,9 @@ function htmlParser(html = '') {
     if (currentParent && !(el.elseif || el.else)) {
       currentParent.children.push(el);
     }
+    postTransforms.forEach(postTransform=>{
+      postTransform(el, options);
+    });
   }
 
   // 处理文本节点（涉及到节点栈的处理）
