@@ -39,7 +39,7 @@ export function addAttr(el, name, value, dynamic = false) {
 }
 
 // 添加事件（原生事件和动态事件）
-export function addHandlers(el, name, value, modifiers = {}, dynamic) {
+export function addHandlers(el, name, value, modifiers = {}, dynamic = false) {
   if (modifiers.capture) {
     name = dynamic ? (`_p(${name}, '!')`) : ('!' + name);
   }
@@ -58,7 +58,7 @@ export function addHandlers(el, name, value, modifiers = {}, dynamic) {
 }
 
 // 添加事件（原生事件和动态事件）
-export function addDriectives(el, name, rawName, value, arg, isDynamicArg, modifiers = {}) {
+export function addDriectives(el, name, rawName, value, arg, isDynamicArg = false, modifiers = {}) {
   (el.directives || (el.directives = [])).push({
     name,
     rawName,
@@ -68,3 +68,28 @@ export function addDriectives(el, name, rawName, value, arg, isDynamicArg, modif
     modifiers
   });
 }
+
+// 处理绑定值 // TODO 没有考虑直接使用实例的情况 如 ['aa'], {a:'1'}, aaa[bb['cc']]或随便乱打如sds;sfsdgf;d'
+export function parseModel(value) {
+  let match = value.match(/\.([^\]]+)$/);
+  if (match) {
+    let key = match[1];
+    return {
+      exp: value.slice(0, -key.length - 1),
+      key: JSON.stringify(key)
+    }
+  }
+  match = value.match(/^[^\[](\[[^\[\]]+\])$/);
+  if (match) {
+    let key = match[1];
+    return {
+      exp: value.slice(0, -key.length),
+      key: key.slice(1, key.length - 1)
+    }
+  }
+  return {
+    exp: value,
+    key: ''
+  }
+}
+

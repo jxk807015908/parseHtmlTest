@@ -5,6 +5,7 @@ import {
   addAttr,
   addHandlers,
   addDriectives,
+  parseModel,
 } from "./utils";
 
 // 处理v-pre属性
@@ -178,6 +179,10 @@ export function processAttrs(el) {
         let isDynamic = /^\[.+\]$/.test(name);
         if (isDynamic) {
           name = name.slice(1, name.length - 1);
+        }
+        if (modifiers && modifiers.sync) {
+          let res = parseModel(value);
+          addHandlers(el, isDynamic ? `"update:"+(${name})` : `update:${name}` , res.key ? `$set(${res.exp}, ${res.key}, $event)` : `${res.exp}=$event`);
         }
         if (modifiers.prop) {
           (el.props || (el.props = [])).push({
