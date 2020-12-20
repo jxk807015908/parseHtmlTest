@@ -1,7 +1,10 @@
 import {
   getAttrs,
   getBindingAttr,
-  getAttrByReg
+  getAttrByReg,
+  addAttr,
+  addHandlers,
+  addDriectives,
 } from "./utils";
 
 // 处理v-pre属性
@@ -145,4 +148,63 @@ export function processComponent(el) {
   if (getBindingAttr(el, 'inline-template') !== undefined ) {
     el.inlineTemplate = true;
   }
+}
+
+// 匹配修饰符正则
+const MODIFIERS_REG = /\.[^.\]]+(?=[^\]]*)/g;
+// 获取修饰符
+function getModifiers(name) {
+  let match = name.match(MODIFIERS_REG) || [];
+  return match.reduce((map, str)=>(map[str.slice(1)] = true,map), {});
+}
+// 处理属性
+export function processAttrs(el) {
+  let attrsList = el.attrsList;
+  attrsList.forEach(attrs=>{
+    let {name, value} = attrs;
+    let rawName = name;
+    if (/^v-|:|@|\.|#/.test(name)) {
+      el.hasBindings = true;
+      let modifiers = getModifiers(name);
+      if (/^\./.test(name)) {
+        (modifiers || (modifiers = {})).prop = true;
+        name = name.slice(1);
+      }
+      if (modifiers) {
+        name = name.replace(MODIFIERS_REG, '');
+      }
+      if (/^v-bind:|:|\./.test(name)) {
+        name = name.replace(/^v-bind:|:|\./, '');
+        let isDynamic = /^\[.+\]$/.test(name);
+        if (isDynamic) {
+          name = name.slice(1, name.length - 1);
+        }
+        if (modifiers.prop) {
+          (el.props || (el.props = [])).push({
+            value,
+            name,
+            dynamic: isDynamic
+          });
+        } else {
+          addAttr(el, name, value, isDynamic);
+        }
+      } else if (/^v-on:|@/.test(name)) {
+        name = name.replace(/^v-on:|@/, '');
+        let isDynamic = /^\[.+\]$/.test(name);
+        if (isDynamic) {
+          name = name.slice(1, name.length - 1);
+        }
+        addHandlers(el, name, value, modifiers, isDynamic);
+      } else if (/^v-/.test(name)) {
+        let arg = name.match(/:(.+)/)[1];
+        let isDynamicArg = arg.test(/^\[.+\]$/);
+        if (isDynamicArg) {
+          arg = arg.slice(1, arg.length - 1);
+        }
+        addDriectives(el, name.match(/^v-(.+):/)[1], rawName, value, arg, isDynamicArg, modifiers);
+      }
+    } else {
+      addAttr(el, name, JSON.stringify(value));
+    }
+  });
 }

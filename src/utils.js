@@ -5,7 +5,9 @@ export function getAttrsMap(attrs = []) {
 
 // 通过属性映射表获取对应属性
 export function getAttrs(el, name) {
-  return el.attrsMap[name];
+  let val = el.attrsMap[name];
+  (val || val === '') && (el.attrsList = el.attrsList.filter(obj=>obj.name !== name));
+  return val
 }
 
 // 获取对应属性值的表达式
@@ -21,5 +23,48 @@ export function getBindingAttr(el, name) {
 
 // 获取对应属性值的表达式
 export function getAttrByReg(el, reg) {
-  return el.attrsList.find(obj=>reg.test(obj.name));
+  let index = el.attrsList.findIndex(obj=>reg.test(obj.name));
+  if (index !== -1) {
+    return el.attrsList.splice(index, 1)[0];
+  }
+}
+
+// 添加属性（动态属性名和静态属性名的分开存放）
+export function addAttr(el, name, value, dynamic = false) {
+  (dynamic ? (el.dynamicAttrs || (el.dynamicAttrs = [])) : (el.attrs || (el.attrs = []))).push({
+    name,
+    value,
+    dynamic
+  })
+}
+
+// 添加事件（原生事件和动态事件）
+export function addHandlers(el, name, value, modifiers = {}, dynamic) {
+  if (modifiers.capture) {
+    name = dynamic ? (`_p(${name}, '!')`) : ('!' + name);
+  }
+  if (modifiers.once) {
+    name = dynamic ? (`_p(${name}, '~')`) : ('~' + name);
+  }
+  if (modifiers.passive) {
+    name = dynamic ? (`_p(${name}, '&')`) : ('&' + name);
+  }
+  let events = (modifiers.native ? (el.nativeEvents || (el.nativeEvents = {})) : (el.events || (el.events = {})));
+  let handlers = (events[name] || (events[name] = []));
+  handlers.push({
+    value,
+    dynamic
+  });
+}
+
+// 添加事件（原生事件和动态事件）
+export function addDriectives(el, name, rawName, value, arg, isDynamicArg, modifiers = {}) {
+  (el.directives || (el.directives = [])).push({
+    name,
+    rawName,
+    value,
+    arg,
+    isDynamicArg,
+    modifiers
+  });
 }

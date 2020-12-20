@@ -12,6 +12,7 @@ import {
   processSlotContent,
   processSlotOutlet,
   processComponent,
+  processAttrs,
 } from "./process";
 
 // 标签开头正则
@@ -151,6 +152,7 @@ function htmlParser(html = '') {
       processSlotContent(el);
       processSlotOutlet(el);
       processComponent(el);
+      processAttrs(el);
       processIfConditions(el);
     }
 
