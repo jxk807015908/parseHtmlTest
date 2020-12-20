@@ -1,20 +1,9 @@
 import htmlParser from './src/html-parser';
 import tpl1 from './template/1.tpl';
+import modules from './src/modules';
 
 let options = {
-  modules: [
-    {
-      transformNode: function (el, options) {
-        console.log('transformNode')
-      },
-      preTransformNode: function (el, options) {
-        console.log('preTransformNode')
-      },
-      postTransformNode: function (el, options) {
-        console.log('postTransformNode')
-      }
-    }
-  ]
+  modules: modules
 }
 // console.log(tpl1);
 console.log(htmlParser(tpl1, options));
