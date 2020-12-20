@@ -93,3 +93,33 @@ export function parseModel(value) {
   }
 }
 
+// 处理文本
+export function parseText(text) {
+  let tokens = [];
+  let expression = '';
+
+  while (text) {
+    let match = text.match(/\{\{\s*(.+?)\s*\}\}/);
+    if (match) {
+      let t = text.slice(0, match.index);
+      tokens.push(t, {
+        '@binding': match[0]
+      });
+      expression += `${JSON.stringify(t)}+_s(${match[0]})`
+      text = text.slice(match.index + match[0].length);
+    } else {
+      if (expression) {
+        tokens.push(text);
+        expression += `+${JSON.stringify(text)}`;
+        break;
+      } else {
+        return {text}
+      }
+    }
+  }
+  return {
+    tokens,
+    expression
+  }
+}
+

@@ -1,5 +1,6 @@
 import {
   getAttrsMap,
+  parseText,
 } from "./utils";
 import {
   processVPre,
@@ -180,9 +181,18 @@ function htmlParser(html = '') {
   // 处理文本节点（涉及到节点栈的处理）
   function chars(text) {
     if (currentParent) {
-      if (inPre || inVPre || text.trim()) {
+      let t = text.trim();
+      if (inVPre) {
+        t && currentParent.children.push({
+          text
+        });
+      } else if (inPre) {
         currentParent.children.push({
-          text: (inPre || inVPre) ? text : text.trim()
+          ...parseText(text)
+        });
+      } else {
+        t && currentParent.children.push({
+          ...parseText(t)
         });
       }
     }
