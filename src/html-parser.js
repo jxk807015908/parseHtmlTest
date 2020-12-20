@@ -182,7 +182,7 @@ function htmlParser(html = '') {
     if (currentParent) {
       if (inPre || inVPre || text.trim()) {
         currentParent.children.push({
-          text: text
+          text: (inPre || inVPre) ? text : text.trim()
         });
       }
     }
