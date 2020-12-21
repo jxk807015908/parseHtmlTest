@@ -127,3 +127,8 @@ export function pluckModuleFunction(modules = [], key) {
   return modules.map(module=>module[key]).filter(o=>o);
 }
 
+// 生成映射表
+export function makeMap(str = '', bool = true) {
+  return str.split(',').reduce((map, s)=>(map[s] = bool, map), {});
+}
+
