@@ -31,6 +31,7 @@ const END_TAG_REG = /^<\/([a-zA-Z_\-]*)[^>]*>/;
 
 function createASTElement(tag, attrs, parent) {
   return {
+    type: 1,
     tag,
     attrsList: attrs,
     attrsMap: getAttrsMap(attrs),
@@ -202,12 +203,16 @@ function htmlParser(html = '', options = {}) {
           text
         });
       } else if (inPre) {
+        let res = parseText(text);
         currentParent.children.push({
-          ...parseText(text)
+          type: res.expression ? 2 : 3,
+          ...res
         });
       } else {
-        t && currentParent.children.push({
-          ...parseText(t)
+        let res;
+        t && (res = parseText(text)) && currentParent.children.push({
+          type: res.expression ? 2 : 3,
+          ...res
         });
       }
     }
