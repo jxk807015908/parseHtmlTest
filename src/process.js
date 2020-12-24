@@ -140,6 +140,13 @@ export function processSlotOutlet(el) {
   }
 }
 
+// 处理标签名为slot的节点
+export function processScopedSlot(el, parent) {
+  if (parent && el.slotScope) {
+    (parent.scopedSlots || (parent.scopedSlots = {}))[el.slotTarget] = el;
+  }
+}
+
 // 处理is、inline-template属性
 export function processComponent(el) {
   let val = getBindingAttr(el, 'is');

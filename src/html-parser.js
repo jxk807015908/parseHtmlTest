@@ -15,6 +15,7 @@ import {
   processSlotOutlet,
   processComponent,
   processAttrs,
+  processScopedSlot,
 } from "./process";
 
 // 标签开头正则
@@ -168,6 +169,7 @@ function htmlParser(html = '', options = {}) {
       });
       processAttrs(el);
       processIfConditions(el);
+      processScopedSlot(el, currentParent);
     }
 
     if (el.pre) {
@@ -187,7 +189,10 @@ function htmlParser(html = '', options = {}) {
     }
 
     if (currentParent && !(el.elseif || el.else)) {
-      currentParent.children.push(el);
+      if (!el.slotScope) {
+        currentParent.children.push(el);
+      }
+      el.parent = currentParent
     }
     postTransforms.forEach(postTransform=>{
       postTransform(el, options);
