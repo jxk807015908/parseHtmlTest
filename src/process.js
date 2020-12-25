@@ -166,12 +166,13 @@ function getModifiers(name) {
   return match.reduce((map, str)=>(map[str.slice(1)] = true,map), {});
 }
 // 处理属性
+const BIND_REG = /^v-bind:|^:|^\./;
 export function processAttrs(el) {
   let attrsList = el.attrsList;
   attrsList.forEach(attrs=>{
     let {name, value} = attrs;
     let rawName = name;
-    if (/^v-|:|@|\.|#/.test(name)) {
+    if (/^v-|^:|^@|^\.|^#/.test(name)) {
       el.hasBindings = true;
       let modifiers = getModifiers(name);
       if (/^\./.test(name)) {
@@ -181,8 +182,8 @@ export function processAttrs(el) {
       if (modifiers) {
         name = name.replace(MODIFIERS_REG, '');
       }
-      if (/^v-bind:|:|\./.test(name)) {
-        name = name.replace(/^v-bind:|:|\./, '');
+      if (BIND_REG.test(name)) {
+        name = name.replace(BIND_REG, '');
         let isDynamic = /^\[.+\]$/.test(name);
         if (isDynamic) {
           name = name.slice(1, name.length - 1);
@@ -200,8 +201,8 @@ export function processAttrs(el) {
         } else {
           addAttr(el, name, value, isDynamic);
         }
-      } else if (/^v-on:|@/.test(name)) {
-        name = name.replace(/^v-on:|@/, '');
+      } else if (/^v-on:|^@/.test(name)) {
+        name = name.replace(/^v-on:|^@/, '');
         let isDynamic = /^\[.+\]$/.test(name);
         if (isDynamic) {
           name = name.slice(1, name.length - 1);
@@ -209,7 +210,7 @@ export function processAttrs(el) {
         addHandlers(el, name, value, modifiers, isDynamic);
       } else if (/^v-/.test(name)) {
         let arg = name.match(/:(.+)/)[1];
-        let isDynamicArg = arg.test(/^\[.+\]$/);
+        let isDynamicArg = /^\[.+\]$/.test(arg);
         if (isDynamicArg) {
           arg = arg.slice(1, arg.length - 1);
         }

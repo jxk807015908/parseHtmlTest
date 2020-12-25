@@ -1,5 +1,5 @@
 <div>
-    <ui v-if="type === 1" @mousedown.native="handleMouseDown" title="sda" :flag.sync="isLoading.bool" :flag2.sync="isLoading" :style="{top: 0}">
+    <ui v-if="type === 1" @mousedown.native="handleMouseDown" title="sda" :flag.sync="isLoading.bool" :flag2.sync="isLoading" :style="{top: 0}" :[attrsName]="hehe" v-scroll-drag:[state]="aaaa">
         <li v-for="item in list" :class="{'is-active': item.val === active}" v-bind:config="config">
             label: {{item.label}}
         </li>
