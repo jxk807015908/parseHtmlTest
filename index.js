@@ -1,6 +1,6 @@
 import htmlParser from './src/html-parser';
 import optimizer from './src/optimizer';
-import codegrn from './src/codegrn';
+import codegen from './src/codegen';
 import tpl1 from './template/1.tpl';
 import modules from './src/modules';
 
@@ -11,4 +11,4 @@ let options = {
 let ast = htmlParser(tpl1, options)
 optimizer(ast, options)
 console.log(ast);
-console.log(codegrn(ast, options));
+console.log(codegen(ast, options));

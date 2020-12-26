@@ -15,6 +15,18 @@ function transformNode(el, options) {
   }
 }
 
+function genData(el, options) {
+  let data = '';
+  if (el.staticClass) {
+    data += `staticClass: ${el.staticClass}`
+  }
+  if (el.classBinding) {
+    data += `,class: ${el.classBinding}`
+  }
+  return data;
+}
+
 export default {
-  transformNode
+  transformNode,
+  genData,
 }
