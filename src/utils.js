@@ -41,19 +41,24 @@ export function addAttr(el, name, value, dynamic = false) {
 // 添加事件（原生事件和动态事件）
 export function addHandlers(el, name, value, modifiers = {}, dynamic = false) {
   if (modifiers.capture) {
+    delete modifiers.capture;
     name = dynamic ? (`_p(${name}, '!')`) : ('!' + name);
   }
   if (modifiers.once) {
+    delete modifiers.capture;
     name = dynamic ? (`_p(${name}, '~')`) : ('~' + name);
   }
   if (modifiers.passive) {
+    delete modifiers.capture;
     name = dynamic ? (`_p(${name}, '&')`) : ('&' + name);
   }
   let events = (modifiers.native ? (el.nativeEvents || (el.nativeEvents = {})) : (el.events || (el.events = {})));
+  delete modifiers.native;
   let handlers = (events[name] || (events[name] = []));
   handlers.push({
     value,
-    dynamic
+    dynamic,
+    modifiers
   });
 }
 
